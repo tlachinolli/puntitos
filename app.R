@@ -15,13 +15,13 @@
 library(shiny)
 library(magrittr)
 library(shinythemes)
-library(plotly)
+library(ggplot2)
 source("linearTransformations.R")
 # Define UI for application that draws a histogram
 ui <- fluidPage(
     theme = shinytheme("lumen"),
     # Application title
-    titlePanel("Your2tor RTPS"),
+    titlePanel("Your2tor RTPS BETA"),
 
     # Sidebar with a 
     #   slider input for degrees from -360 to 360
@@ -31,7 +31,7 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             h4("DIY mode"),
-            helpText("(See instructions below)"),
+            helpText(HTML("<a href='#instruct'>Go to Instructions</a>")),
             helpText("Suscribe to get infinite mode!"),
             radioButtons("radio", h5("Choose figure"),
                          choices = list("Square" = 1, "Right Triangle" = 2, "Acute Triangle" = 3),selected = character(0)),
@@ -55,7 +55,7 @@ ui <- fluidPage(
                         max = 70,
                         value = 0),
             actionButton("imprimirFigura", "Print"),
-            h4("Instructions"),
+            h4("Instructions", id = "instruct"),
             helpText("1. Select a radio button to insert the correspondant figure vertex set (The first figure is centered at the origin)"
             ),
             helpText("2. Tranform the figure vertex set by using the sliders"
@@ -79,11 +79,10 @@ ui <- fluidPage(
         # Show a plot of all inserted object vertex sets
         mainPanel(
             h1(" Rotation & Traslation of Point Sets"),
-            p("Hide some figures and dare your friends to find them"),
+            p("Hide some figures and dare your fellow students to find them!"),
            plotOutput("pointPlot"),
-           tableOutput("vertSetMatrix"),
+           # tableOutput("vertSetMatrix"),
            plotOutput("linePlot")
-           
         )
     )
 )
@@ -108,7 +107,7 @@ server <- function(input, output, session) {
             trasladarFiguraHorizontal(.,horT()) %>%
             trasladarFiguraVertical(.,verT())
         
-        v$data <- cbind(v$data, type = aux)
+        v$data <- cbind(v$data, type = aux, n = input$insertarFigura)
         dt$data <- rbind(dt$data, v$data)
     })
     
@@ -125,7 +124,7 @@ server <- function(input, output, session) {
     
     output$pointPlot <- renderPlot({
 # Este plot será elemento reactivo cada ves que se inserte figura
-# la grafica base cambiará a la grafica con figura insertada
+# la grafica base cambiará a la grafica con figuras previas insertadas
 # el control cambiará a modificar nuevas figuras a insertar
             if(length(input$radio)==0) return(0)
             aux <- input$radio
@@ -150,24 +149,19 @@ server <- function(input, output, session) {
     
     output$linePlot <- renderPlot({
         if (is.null(dt$data)) return()
+        pal <- qualitative_hcl(3, palette = "Cold")
         df <- as.data.frame(dt$data)
+        df$type <- as.factor(df$type)
+        p <- ggplot(df, aes(x, y, colour = type, group = n)) + 
+            geom_point()
         
-#       df$type <- as.factor(df$type)
-        
-        
-        fig <- plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length)
-        
-        
-        fig
-        # p <- ggplot(df, aes(x, y, fill = type)) + 
-       #      geom_point()
-       # p + geom_polygon() + coord_fixed()
+        p + scale_color_manual(values = pal) + geom_polygon(fill = NA) + coord_fixed() + theme_minimal()
     })
     
-    output$vertSetMatrix <- renderTable({ # test data table to keep vertex set
-        if (is.null(dt$data)) return()
-        dt$data
-    })
+    # output$vertSetMatrix <- renderTable({ # test data table to keep vertex set
+    #     if (is.null(dt$data)) return()
+    #     dt$data
+    # })
 }
 
 # Run the application 
