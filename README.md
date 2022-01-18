@@ -10,6 +10,13 @@ Instructions
 * The solution is added at the end of exported file!
 
 # Hace falta
+
+Implementar figura de muestra. Antes de la gráfica de vértices. mostrar la información de el número de figuras insertadas y el tipo. me imagino algo así
+
+2 (figura de triangulo rectangulo)  4 (figura de triangulo acutangulo)  2 (figura de cuadrado)
+
+donde lo que va entre parentesis se sustituya por una grafica real de la figura en curestión. Esta puede ser creada con la funcion crearFigura pero agregar los lados (edges). ( esto va servir para indicar al estudiante como se deberían ver las figuras que va buscar en el diagrama de puntos)
+
 Bloque de código de botón print
 El botón print deberá permitirte descargar un archivo con el la gráfica de los vértices y la solución (al final de la hoja o en otra).
 
